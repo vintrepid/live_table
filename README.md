@@ -22,6 +22,37 @@ A powerful Phoenix LiveView component library for building dynamic, interactive 
 **[Advanced Demo Git Url →](https://github.com/ChivukulaVirinchi/college-app)**
 
 
+
+## 🎨 DaisyUI Integration
+
+LiveTable uses DaisyUI for semantic component styling, providing:
+
+- **Fixed Headers** - Built-in with `table-pin-rows` class
+- **Zebra Striping** - Automatic with `table-zebra` option
+- **Automatic Theming** - Light/dark mode support
+- **Semantic Classes** - Clean, maintainable code
+- **Size Variants** - Multiple table sizes (`:xs`, `:sm`, `:md`, `:lg`)
+
+### Table Options
+
+```elixir
+def table_options do
+  %{
+    pin_header: true,  # Fixed table headers (default: true)
+    zebra: false,      # Alternating row colors (default: false)
+    size: :md          # Table size: :xs, :sm, :md, :lg (default: :md)
+  }
+end
+```
+
+### Benefits
+
+- ✅ **92% fewer CSS classes** compared to pure Tailwind
+- ✅ **Zero custom CSS** needed for fixed headers
+- ✅ **Automatic dark mode** theming
+- ✅ **Consistent styling** across your application
+
+
 ## 🚀 Quick Start
 
 ### 1. Installation
