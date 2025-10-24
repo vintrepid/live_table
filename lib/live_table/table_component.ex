@@ -190,77 +190,68 @@ defmodule LiveTable.TableComponent do
 
       defp content_section(%{table_options: %{mode: :table}} = var!(assigns)) do
         ~H"""
-        <div class="mt-8 flow-root">
-          <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              <div class="overflow-hidden shadow sm:rounded-lg">
-                <table class="table divide-y dark:divide-gray-700">
-                  <thead class="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th
-                        :for={{key, field} <- @fields}
-                        scope="col"
-                        class="px-3 py-3.5 text-start text-sm font-semibold text-gray-900 dark:text-gray-100"
-                      >
-                        <.sort_link
-                          key={key}
-                          label={field.label}
-                          sort_params={@options["sort"]["sort_params"]}
-                          sortable={field.sortable}
-                        />
-                      </th>
-                      <th
-                        :if={has_actions(@actions)}
-                        scope="col"
-                        class="px-3 py-3.5 text-start text-sm font-semibold text-gray-900 dark:text-gray-100"
-                      >
-                        {actions_label(@actions)}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y dark:divide-gray-700 bg-white dark:bg-gray-900">
-                    <tr id="empty-placeholder" class="only:table-row hidden">
-                      <td
-                        colspan={length(@fields) + if(has_actions(@actions), do: 1, else: 0)}
-                        class="py-10 text-center"
-                      >
-                        <svg
-                          class="mx-auto h-12 w-12 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          No data
-                        </h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                          Get started by creating a new record.
-                        </p>
-                      </td>
-                    </tr>
-                    <.render_row
-                      streams={@streams}
-                      fields={@fields}
-                      table_options={@table_options}
-                      actions={@actions}
+        <div class="mt-8 overflow-x-auto">
+          <table class={table_classes(@table_options)}>
+            <thead>
+              <tr>
+                <th
+                  :for={{key, field} <- @fields}
+                  scope="col"
+                >
+                  <.sort_link
+                    key={key}
+                    label={field.label}
+                    sort_params={@options["sort"]["sort_params"]}
+                    sortable={field.sortable}
+                  />
+                </th>
+                <th
+                  :if={has_actions(@actions)}
+                  scope="col"
+                >
+                  {actions_label(@actions)}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="empty-placeholder" class="only:table-row hidden">
+                <td
+                  colspan={length(@fields) + if(has_actions(@actions), do: 1, else: 0)}
+                  class="py-10 text-center"
+                >
+                  <svg
+                    class="mx-auto h-12 w-12 opacity-40"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                     />
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+                  </svg>
+                  <h3 class="mt-2 text-sm font-semibold">
+                    No data
+                  </h3>
+                  <p class="mt-1 text-sm opacity-60">
+                    Get started by creating a new record.
+                  </p>
+                </td>
+              </tr>
+              <.render_row
+                streams={@streams}
+                fields={@fields}
+                table_options={@table_options}
+                actions={@actions}
+              />
+            </tbody>
+          </table>
         </div>
         """
       end
-
       defp content_section(%{table_options: %{mode: :card, use_streams: false}} = var!(assigns)) do
         ~H"""
         <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -482,6 +473,26 @@ defmodule LiveTable.TableComponent do
         </div>
         """
       end
+      defp table_classes(table_options) do
+        base = ["table"]
+        
+        pin_header = get_in(table_options, [:pin_header]) != false
+        zebra = get_in(table_options, [:zebra]) == true
+        size = get_in(table_options, [:size]) || :md
+        
+        classes = if pin_header, do: base ++ ["table-pin-rows"], else: base
+        classes = if zebra, do: classes ++ ["table-zebra"], else: classes
+        
+        classes = case size do
+          :xs -> classes ++ ["table-xs"]
+          :sm -> classes ++ ["table-sm"]
+          :lg -> classes ++ ["table-lg"]
+          _ -> classes
+        end
+        
+        Enum.join(classes, " ")
+      end
+
 
       defp render_cell(value, field, _record)
            when is_nil(value) and not is_nil(field.empty_text) do

@@ -181,9 +181,51 @@ field_name: %{
   label: "Display Name",      # Always provide
   sortable: true,            # REQUIRED if field should be sortable
   searchable: true,          # REQUIRED if field should be searchable
-  component: custom_component # Optional, for custom rendering
 }
 ```
+
+### Custom Rendering with `renderer`
+
+**CRITICAL**: Use `renderer:` for custom cell formatting, not `component:` or `value:`.
+
+The `renderer` function can receive either:
+- **function/1**: Receives only the cell value
+- **function/2**: Receives the cell value AND the full record/row
+
+```elixir
+# Function/1: Access only the cell value
+status: %{
+  label: "Status",
+  renderer: fn value -> 
+    content_tag(:span, String.upcase(value), class: "badge badge-#{value}")
+  end
+}
+
+# Function/2: Access cell value AND full record for conditional rendering
+priority: %{
+  label: "Priority",
+  renderer: fn value, record ->
+    class = if record.urgent, do: "text-red-600 font-bold", else: "text-gray-500"
+    content_tag(:span, value, class: class)
+  end
+}
+
+# Using Phoenix.Component ~H sigil for complex markup
+user_info: %{
+  label: "User",
+  renderer: fn _value, record ->
+    assigns = %{user: record}
+    ~H"""
+    <div class="flex items-center gap-2">
+      <img src={@user.avatar_url} class="w-8 h-8 rounded-full" />
+      <span>{@user.name}</span>
+    </div>
+    """
+  end
+}
+```
+
+**Why function/2 is powerful**: Access to the full record lets you use data from ANY field, not just the current column's field. For example, showing a status badge that changes color based on a different field's value.
 
 ### Association Sorting (Custom Queries Only)
 ```elixir
