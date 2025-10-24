@@ -139,7 +139,7 @@ defmodule LiveTable.TableComponent do
                 
         <!-- Per page -->
                 <select
-                  :if={@options["pagination"]["paginate?"]}
+                  :if={@options["pagination"]["paginate?"] && length(get_in(@table_options, [:pagination, :sizes]) || []) > 1}
                   name="per_page"
                   value={@options["pagination"]["per_page"]}
                   class="select select-bordered w-20"
