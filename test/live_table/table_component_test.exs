@@ -14,6 +14,15 @@ defmodule LiveTable.TableComponentTest do
       }
   end
 
+  defmodule SinglePageSizeTableComponent do
+    use LiveTable.TableComponent,
+      table_options: %{
+        mode: :table,
+        use_streams: false,
+        pagination: %{sizes: [25]}
+      }
+  end
+
   defmodule CardTableComponent do
     use LiveTable.TableComponent,
       table_options: %{
@@ -308,6 +317,23 @@ defmodule LiveTable.TableComponentTest do
 
       assert html =~ "name=\"per_page\""
       assert html =~ "value=\"25\""
+    end
+
+    test "hides per page selector when only one size is configured" do
+      assigns = %{
+        fields: [{:name, %{label: "Name", sortable: false}}],
+        filters: [],
+        options: %{
+          "filters" => %{"search" => ""},
+          "sort" => %{"sort_params" => []},
+          "pagination" => %{"paginate?" => true, "per_page" => 25, "page" => "1"}
+        },
+        streams: []
+      }
+
+      html = render_component(&SinglePageSizeTableComponent.live_table/1, assigns)
+
+      refute html =~ "name=\"per_page\""
     end
   end
 
